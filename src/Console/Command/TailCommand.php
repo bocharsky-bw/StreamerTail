@@ -6,6 +6,7 @@ use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class TailCommand extends Command
@@ -24,15 +25,24 @@ class TailCommand extends Command
                 InputArgument::REQUIRED,
                 'SQL query to tail'
             )
+            ->addOption(
+                'url',
+                'u',
+                InputOption::VALUE_OPTIONAL,
+                'Database config URL',
+                'mysql://root@localhost'
+            )
         ;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $conn = DriverManager::getConnection([
-            'url' => 'mysql://root@localhost',
-        ]);
         $query = (string)$input->getArgument('query');
+        $url = (string)$input->getOption('url');
+        $conn = DriverManager::getConnection([
+            'url' => $url,
+        ]);
+
         $countQuery = 'SELECT COUNT(*) FROM '.preg_replace('/^SELECT.+?FROM/i', '', $query);
         $limitQuery = preg_replace('/LIMIT.+?$/i', '', $query).' LIMIT :offset, :limit';
 
@@ -108,7 +118,7 @@ class TailCommand extends Command
                         foreach ($row as $name => $column) {;
                             $output->writeln(sprintf('<options=bold>%s: %s</>', $name, $column));
                         }
-                        $output->writeln('=====================');
+                        $output->writeln('---');
                     }
                 break;
             }
