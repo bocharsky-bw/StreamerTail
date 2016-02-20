@@ -19,18 +19,38 @@ class TailCommand extends Command
     {
         $this
             ->setName('tail')
-            ->setDescription('Display the last part of a data which fetched by specified SQL query')
+            ->setDescription('Display the last part of a data which fetched by specified SQL query.')
             ->addArgument(
                 'query',
                 InputArgument::REQUIRED,
-                'SQL query to tail'
+                'SQL query to tail.'
             )
             ->addOption(
                 'url',
                 'u',
                 InputOption::VALUE_OPTIONAL,
-                'Database config URL',
+                'Database config URL.',
                 'mysql://root@localhost'
+            )
+            ->addOption(
+                'sleep',
+                's',
+                InputOption::VALUE_OPTIONAL,
+                'Number of seconds to refresh.',
+                1
+            )
+            ->addOption(
+                'limit',
+                'l',
+                InputOption::VALUE_OPTIONAL,
+                'Number of rows to limit.',
+                3
+            )
+            ->addOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Wait for additional data to be appended to the input.'
             )
         ;
     }
@@ -39,19 +59,19 @@ class TailCommand extends Command
     {
         $query = (string)$input->getArgument('query');
         $url = (string)$input->getOption('url');
+        $sleep = (int)$input->getOption('sleep');
+        $limit = (int)$input->getOption('limit');
+        $watch = (bool)$input->getOption('force');
+
         $conn = DriverManager::getConnection([
             'url' => $url,
         ]);
-
         $countQuery = 'SELECT COUNT(*) FROM '.preg_replace('/^SELECT.+?FROM/i', '', $query);
         $limitQuery = preg_replace('/LIMIT.+?$/i', '', $query).' LIMIT :offset, :limit';
 
         $count = 0;
-        $limit = 3;
         $isFirstLoop = true;
-        $sleepSeconds = 2.0; // in seconds
-
-        while (true) {
+        do {
             $previousCount = $count;
             $count = (int)$conn->fetchColumn($countQuery);
             // Check whether is file truncated
@@ -124,7 +144,7 @@ class TailCommand extends Command
             }
 
             $isFirstLoop = false;
-            sleep($sleepSeconds);
-        }
+            sleep($sleep);
+        } while ($watch);
     }
 }
