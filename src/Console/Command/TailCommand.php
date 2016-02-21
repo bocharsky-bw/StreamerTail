@@ -4,6 +4,7 @@ namespace StreamerTail\Console\Command;
 
 use Doctrine\DBAL\DriverManager;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -103,7 +104,7 @@ class TailCommand extends Command
                 }
             }
 
-            $display = self::DISPLAY_INLINE;
+            $display = self::DISPLAY_TABLE;
             switch ($display) {
                 case self::DISPLAY_INLINE:
                     // Print headers:
@@ -120,17 +121,13 @@ class TailCommand extends Command
                 break;
 
                 case self::DISPLAY_TABLE:
-                    // Print headers:
+                    $table = new Table($output);
                     if ($isFirstLoop) {
                         $headlines = array_keys($rows[0]);
-                        $line = implode("\t", $headlines);
-                        $output->writeln(sprintf('<options=bold>%s</>', $line));
+                        $table->setHeaders($headlines);
                     }
-
-                    foreach ($rows as $name => $row) {
-                        $line = implode("\t", $row);
-                        $output->writeln($line);
-                    }
+                    $table->setRows($rows);
+                    $table->render();
                 break;
 
                 case self::DISPLAY_LIST:
