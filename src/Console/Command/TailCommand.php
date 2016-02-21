@@ -12,8 +12,8 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class TailCommand extends Command
 {
-    const DISPLAY_INLINE = 'inline';
     const DISPLAY_TABLE = 'table';
+    const DISPLAY_COMPACT = 'compact';
     const DISPLAY_LIST = 'list';
 
     protected function configure()
@@ -62,7 +62,7 @@ class TailCommand extends Command
         $url = (string)$input->getOption('url');
         $sleep = (int)$input->getOption('sleep');
         $limit = (int)$input->getOption('limit');
-        $watch = (bool)$input->getOption('force');
+        $isWatched = (bool)$input->getOption('force');
 
         $conn = DriverManager::getConnection([
             'url' => $url,
@@ -104,22 +104,8 @@ class TailCommand extends Command
                 }
             }
 
-            $display = self::DISPLAY_TABLE;
+            $display = self::DISPLAY_LIST;
             switch ($display) {
-                case self::DISPLAY_INLINE:
-                    // Print headers:
-                    if ($isFirstLoop) {
-                        $headlines = array_keys($rows[0]);
-                        $line = implode("\t", $headlines);
-                        $output->writeln(sprintf('<options=bold>%s</>', $line));
-                    }
-
-                    foreach ($rows as $row) {
-                        $line = implode("\t", $row);
-                        $output->writeln($line);
-                    }
-                break;
-
                 case self::DISPLAY_TABLE:
                     $table = new Table($output);
                     if ($isFirstLoop) {
@@ -130,18 +116,36 @@ class TailCommand extends Command
                     $table->render();
                 break;
 
+                case self::DISPLAY_COMPACT:
+                    $table = new Table($output);
+                    if ($isFirstLoop) {
+                        $headlines = array_keys($rows[0]);
+                        $table->setHeaders($headlines);
+                    }
+                    $table->setRows($rows);
+                    $table->setStyle('compact');
+                    $table->render();
+                break;
+
                 case self::DISPLAY_LIST:
+                    $table = new Table($output);
                     foreach ($rows as $row) {
                         foreach ($row as $name => $column) {;
-                            $output->writeln(sprintf('<options=bold>%s: %s</>', $name, $column));
+                            $table->addRow([
+                                sprintf('<options=bold>%s: %s</>', $name, $column),
+                            ]);
                         }
-                        $output->writeln('---');
+                        $table->addRow(['---']);
                     }
+                    $table->setStyle('compact');
+                    $table->render();
                 break;
             }
 
             $isFirstLoop = false;
-            sleep($sleep);
-        } while ($watch);
+            if ($isWatched) {
+                sleep($sleep);
+            }
+        } while ($isWatched);
     }
 }
