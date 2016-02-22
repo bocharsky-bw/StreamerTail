@@ -27,6 +27,12 @@ class TailCommand extends Command
                 'SQL query to tail.'
             )
             ->addOption(
+                'force',
+                'f',
+                InputOption::VALUE_NONE,
+                'Wait for additional data to be appended to the input.'
+            )
+            ->addOption(
                 'url',
                 'u',
                 InputOption::VALUE_OPTIONAL,
@@ -37,7 +43,7 @@ class TailCommand extends Command
                 'sleep',
                 's',
                 InputOption::VALUE_OPTIONAL,
-                'Number of seconds to refresh.',
+                'Number in seconds to refresh data.',
                 1
             )
             ->addOption(
@@ -46,12 +52,6 @@ class TailCommand extends Command
                 InputOption::VALUE_OPTIONAL,
                 'Number of rows to limit.',
                 3
-            )
-            ->addOption(
-                'force',
-                'f',
-                InputOption::VALUE_NONE,
-                'Wait for additional data to be appended to the input.'
             )
         ;
     }
