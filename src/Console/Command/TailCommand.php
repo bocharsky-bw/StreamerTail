@@ -83,6 +83,9 @@ class TailCommand extends Command
 
             $incrementCount = $count - $previousCount;
             $offset = $isFirstLoop ? $count - $limit : $previousCount;
+            if (0 > $offset) {
+                $offset = 0;
+            }
             $limit = $isFirstLoop ? $limit : $incrementCount;
 
             $rows = $conn->fetchAll($limitQuery, [
@@ -131,8 +134,12 @@ class TailCommand extends Command
                     $table = new Table($output);
                     foreach ($rows as $row) {
                         foreach ($row as $name => $column) {;
+//                            $table->addRow([
+//                                sprintf('<options=bold>%s:</> %s', $name, $column),
+//                            ]);
                             $table->addRow([
-                                sprintf('<options=bold>%s: %s</>', $name, $column),
+                                sprintf('<options=bold>%s</>', $name),
+                                $column,
                             ]);
                         }
                         $table->addRow(['---']);
