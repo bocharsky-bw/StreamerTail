@@ -2,6 +2,8 @@
 
 Display the last part of a data which fetched by specified SQL query.
 
+Inspired by Unix's [tail][5] command to display the tail end of a text file. 
+
 * [Installation](#installation)
 * [Usage](#usage)
 * [Option list](#option-list)
@@ -46,13 +48,13 @@ next command with `-f` option.
 
 List of available options for `tail` command:
 
-* `-f`, `--force`         - Wait for additional data to be appended to the
-  table that observed with specified SQL query.
-* `-u`, `--url[=URL]`     - Database config URL. [default: "mysql://root@localhost"].
+* `-f`, `--force` - Wait for additional data to be appended to the table
+  that observed with specified SQL query if used.
+* `-u`, `--url[=URL]`, [default: `mysql://root@localhost`] - Database config URL.
   See Doctrine's [configuration][4] page for more info about URL syntax.
-* `-s`, `--sleep[=SLEEP]` - Number in seconds to refresh data. [default: 1].
+* `-s`, `--sleep[=SLEEP]`, [default: `1`] - Number in seconds to refresh data.
   Time in seconds before new data will be re-fetched with specified SQL query.
-* `-l`, `--limit[=LIMIT]` - Number of latest rows to limit from start. [default: 3]
+* `-l`, `--limit[=LIMIT]`, [default: `3`] - Number of latest rows to limit from start.
 
 To see the full list of available options for `tail` command run next:
 
@@ -75,3 +77,4 @@ and discuss it first.
 [2]: https://github.com/bocharsky-bw/StreamerTail/pulls
 [3]: https://getcomposer.org/
 [4]: http://doctrine-orm.readthedocs.org/projects/doctrine-dbal/en/latest/reference/configuration.html
+[5]: https://en.wikipedia.org/wiki/Tail_(Unix)

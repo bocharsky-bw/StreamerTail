@@ -107,7 +107,7 @@ class TailCommand extends Command
                 }
             }
 
-            $display = self::DISPLAY_LIST;
+            $display = self::DISPLAY_TABLE;
             switch ($display) {
                 case self::DISPLAY_TABLE:
                     $table = new Table($output);
